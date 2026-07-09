@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: asset_pg
+    environment:
+      POSTGRES_DB: asset_db
+      POSTGRES_USER: asset_user
+      POSTGRES_PASSWORD: asset_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./sql/02_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+      - ./sql/03_views.sql:/docker-entrypoint-initdb.d/03_views.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  spark:
+    image: bitnami/spark:3.5
+    container_name: asset_spark
+    depends_on:
+      - postgres
+    environment:
+      - SPARK_MODE=master
+    volumes:
+      - ./:/workspace
+      - ./data:/workspace/data
+    working_dir: /workspace
+    command: ["sleep", "infinity"]
+
+volumes:
+  postgres_data:
