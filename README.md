@@ -49,45 +49,37 @@ O objetivo é consolidar posições de fundos e tabelas relacionadas em uma estr
 ## Estrutura do repositório
 
 ```text
-asset-management-bsg/
+desafio-engenharia-dados/
 ├── README.md
 ├── docker-compose.yml
-├── .env.example
 ├── requirements.txt
-├── notebooks/
-│   └── exploration.ipynb
+├── scripts/
+│   └── run_pipeline.sh
 ├── sql/
 │   ├── 01_schema.sql
 │   ├── 02_seed.sql
 │   └── 03_views.sql
 ├── src/
-│   ├── config/
-│   │   └── settings.py
+│   ├── pipeline.py
 │   ├── jobs/
 │   │   ├── bronze_job.py
 │   │   ├── silver_job.py
-│   │   └── gold_job.py
+│   │   ├── gold_job.py
+│   │   └── export_job.py
 │   ├── transforms/
 │   │   ├── bronze_extractor.py
 │   │   ├── silver_transformer.py
-│   │   └── gold_builder.py
+│   │   ├── gold_builder.py
+│   │   └── flat_file_writer.py
 │   └── utils/
+│       ├── logging_config.py
 │       ├── paths.py
 │       └── spark.py
-├── tests/
-│   ├── test_silver_transformer.py
-│   ├── test_gold_builder.py
-│   └── test_paths.py
-├── control-m/
-│   ├── job_flow.md
-│   └── sample_job_definitions.md
-├── data/
-│   ├── bronze/
-│   ├── silver/
-│   └── gold/
-└── docs/
-    ├── architecture.md
-    └── decisions.md
+└── tests/
+    ├── test_silver_transformer.py
+    ├── test_gold_builder.py
+    ├── test_flat_file_writer.py
+    └── test_paths.py
 ```
 ## Bronze layer
 
@@ -230,6 +222,51 @@ python src/jobs/gold_job.py \
   --silver-path ./data/silver \
   --gold-path ./data/gold
 ```
+
+5. Exportar o arquivo flat (CSV) consolidado em um diretório parametrizado
+```bash
+python src/jobs/export_job.py \
+  --silver-path ./data/silver \
+  --output-dir ./data/export \
+  --filename consolidated_positions.csv
+```
+
+### Execução automatizada (pipeline completo)
+
+Todas as etapas acima podem ser executadas de uma vez, com um único comando. Qualquer
+falha em uma etapa aborta o processo e retorna código de saída diferente de zero:
+
+```bash
+python -m src.pipeline \
+  --jdbc-url jdbc:postgresql://localhost:5432/asset_db \
+  --user asset_user \
+  --password asset_pass \
+  --output-dir ./data/export
+```
+
+Ou, dentro do container Docker:
+
+```bash
+docker compose exec spark bash scripts/run_pipeline.sh
+```
+
+## Arquivo flat de saída (requisito principal)
+
+O desafio pede um **único arquivo flat (CSV)** agregando as tabelas em uma visão única,
+em um diretório parametrizado pelo usuário. Isso é atendido por `src/jobs/export_job.py`
+(e pelo pipeline completo), que grava um único CSV com a seguinte estrutura:
+
+```text
+fund_code | fund_name | position_date | asset_code | asset_name | issuer_name | asset_type | quantity | market_price | financial_value | nav_percentage
+```
+
+## Tratamento de erros e logging
+
+- Logging estruturado via `src/utils/logging_config.py` (nível controlado por `LOG_LEVEL`), emitido em stderr.
+- Cada job (`bronze`, `silver`, `gold`, `export`) valida entradas, registra o erro com contexto e **propaga** a falha com código de saída 1 — nada é silenciosamente ignorado.
+- Falhas de leitura das camadas (bronze/silver) recebem mensagem indicando qual etapa anterior precisa ter rodado.
+- Os recursos do Spark são liberados em `finally`, mesmo quando ocorre erro.
+- Os transformadores validam colunas obrigatórias e lançam `ValueError` claro em vez de erros crípticos do Spark.
 
 ## Estrutura de saída
 
