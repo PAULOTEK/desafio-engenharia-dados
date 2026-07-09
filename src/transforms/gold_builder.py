@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import sum as _sum, avg, count, desc
+from pyspark.sql.functions import sum as _sum, avg, count
 
 
 def build_gold(silver_df: DataFrame) -> DataFrame:

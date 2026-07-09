@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+data/bronze/
+data/silver/
+data/gold/
+data/export/
+*.crc
+_flat_file_staging/

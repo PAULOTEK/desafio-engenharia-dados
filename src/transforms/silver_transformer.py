@@ -2,8 +2,26 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, upper, trim, regexp_replace, row_number, desc, when, lit
 from pyspark.sql.window import Window
 
+from src.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
+
+
+def _require_columns(df: DataFrame, columns: list, df_name: str) -> None:
+    missing = [c for c in columns if c not in df.columns]
+    if missing:
+        raise ValueError(
+            f"DataFrame '{df_name}' is missing required columns {missing}. Available: {df.columns}"
+        )
+
 
 def transform_silver(position_df: DataFrame, fund_df: DataFrame, asset_df: DataFrame, issuer_df: DataFrame, market_price_df: DataFrame) -> DataFrame:
+    _require_columns(position_df, ["fund_id", "asset_id", "position_date", "quantity", "market_price", "financial_value", "nav_percentage"], "position")
+    _require_columns(fund_df, ["fund_id", "fund_code", "fund_name", "fund_type"], "fund")
+    _require_columns(asset_df, ["asset_id", "asset_code", "asset_name", "asset_type", "issuer_id"], "asset")
+    _require_columns(issuer_df, ["issuer_id", "issuer_name", "issuer_document", "sector"], "issuer")
+    _require_columns(market_price_df, ["asset_id", "reference_date", "price"], "market_price")
+
     fund_df = fund_df.select(
         col("fund_id"),
         upper(trim(col("fund_code"))).alias("fund_code"),
