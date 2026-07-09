@@ -44,8 +44,16 @@ def transform_silver(position_df: DataFrame, fund_df: DataFrame, asset_df: DataF
         trim(col("sector")).alias("sector")
     )
 
-    latest_price_window = Window.partitionBy("asset_id", "reference_date").orderBy(desc("price"))
-    market_price_df = market_price_df.withColumn("rn", row_number().over(latest_price_window)).filter(col("rn") == 1).drop("rn")
+    # Keep a single "current" price per asset (most recent reference_date, highest
+    # price as tie-break) so joining on asset_id does not fan out each position
+    # across every historical price date.
+    latest_price_window = Window.partitionBy("asset_id").orderBy(desc("reference_date"), desc("price"))
+    market_price_df = (
+        market_price_df
+        .withColumn("rn", row_number().over(latest_price_window))
+        .filter(col("rn") == 1)
+        .select("asset_id", col("price").alias("latest_market_price"), "reference_date")
+    )
 
     joined = (
         position_df

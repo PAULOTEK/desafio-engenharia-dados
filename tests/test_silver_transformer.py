@@ -51,6 +51,25 @@ def test_transform_silver_standardizes_and_keeps_flat_columns():
         spark.stop()
 
 
+def test_transform_silver_does_not_fan_out_on_multiple_price_dates():
+    spark = _spark()
+    try:
+        position, fund, asset, issuer, _ = _base_frames(spark)
+        # Same asset with several historical price dates must not multiply the position.
+        market_price = spark.createDataFrame(
+            [
+                (1, "2026-07-01", 10.50, "B3"),
+                (1, "2026-07-02", 10.75, "B3"),
+                (1, "2026-06-30", 10.10, "B3"),
+            ],
+            ["asset_id", "reference_date", "price", "source"],
+        )
+        result = transform_silver(position, fund, asset, issuer, market_price)
+        assert result.count() == 1
+    finally:
+        spark.stop()
+
+
 def test_transform_silver_raises_on_missing_columns():
     spark = _spark()
     try:
