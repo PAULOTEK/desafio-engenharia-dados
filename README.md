@@ -202,7 +202,7 @@ docker compose up -d
 
 2. Executar extração bronze
 ```bash
-python src/jobs/bronze_job.py \
+python -m src.jobs.bronze_job \
   --output ./data/bronze \
   --jdbc-url jdbc:postgresql://localhost:5432/asset_db \
   --user asset_user \
@@ -211,21 +211,21 @@ python src/jobs/bronze_job.py \
 
 3. Gerar silver
 ```bash
-python src/jobs/silver_job.py \
+python -m src.jobs.silver_job \
   --bronze-path ./data/bronze \
   --silver-path ./data/silver
 ```
 
 4. Gerar gold
 ```bash
-python src/jobs/gold_job.py \
+python -m src.jobs.gold_job \
   --silver-path ./data/silver \
   --gold-path ./data/gold
 ```
 
 5. Exportar o arquivo flat (CSV) consolidado em um diretório parametrizado
 ```bash
-python src/jobs/export_job.py \
+python -m src.jobs.export_job \
   --silver-path ./data/silver \
   --output-dir ./data/export \
   --filename consolidated_positions.csv
