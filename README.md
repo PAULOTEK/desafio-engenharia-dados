@@ -260,6 +260,11 @@ em um diretório parametrizado pelo usuário. Isso é atendido por `src/jobs/exp
 fund_code | fund_name | position_date | asset_code | asset_name | issuer_name | asset_type | quantity | market_price | financial_value | nav_percentage
 ```
 
+Formatação de saída:
+- Colunas numéricas (`quantity`, `market_price`, `financial_value`, `nav_percentage`) são gravadas com **2 casas decimais** (sem separador de milhar), para um CSV limpo.
+- As linhas são ordenadas por `fund_code`, `asset_code`, `position_date`.
+- Além do `.csv`, é gerado um `.txt` companheiro com a **tabela alinhada por coluna** (fixed-width) para leitura humana.
+
 ## Tratamento de erros e logging
 
 - Logging estruturado via `src/utils/logging_config.py` (nível controlado por `LOG_LEVEL`), emitido em stderr.
