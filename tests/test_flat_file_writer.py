@@ -27,13 +27,25 @@ def test_write_flat_file_produces_single_csv(tmp_path):
         final_path = write_flat_file(df, out_dir, "consolidated.csv")
 
         assert os.path.isfile(final_path)
-        # Only the final file should remain (staging dir removed).
-        assert os.listdir(out_dir) == ["consolidated.csv"]
+        # Staging dir removed; CSV plus the aligned .txt companion remain.
+        assert sorted(os.listdir(out_dir)) == ["consolidated.csv", "consolidated.txt"]
 
         with open(final_path, newline="") as fh:
             rows = list(csv.reader(fh))
         assert rows[0] == FLAT_FILE_COLUMNS
         assert len(rows) == 3  # header + 2 data rows
+
+        # Numeric columns are formatted to exactly 2 decimals (no thousands separator).
+        record = dict(zip(rows[0], rows[1]))
+        assert record["quantity"] == "1000.00"
+        assert record["market_price"] == "10.75"
+        assert record["financial_value"] == "10750.00"
+        assert record["nav_percentage"] == "12.50"
+
+        # Aligned view is readable and column-separated.
+        with open(os.path.join(out_dir, "consolidated.txt"), encoding="utf-8") as fh:
+            aligned = fh.read()
+        assert "fund_code" in aligned and " | " in aligned
     finally:
         spark.stop()
 
