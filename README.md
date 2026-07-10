@@ -351,8 +351,9 @@ Se quiser ficar mais completo:
 
 ---
 
-## Sugestão de desenho textual da arquitetura
+## desenho textual da arquitetura
 
+![architecture.png](architecture.png)
 ```text
 [PostgreSQL]
      |
