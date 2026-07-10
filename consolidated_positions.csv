@@ -1,0 +1,7 @@
+fund_code,fund_name,position_date,asset_code,asset_name,issuer_name,asset_type,quantity,market_price,financial_value,nav_percentage
+FUND001,Fundo Alpha,2026-07-02,ATV001,Ação XYZ,Empresa XYZ S.A.,Ação,1000.00,10.75,10750.00,12.50
+FUND001,Fundo Alpha,2026-07-02,ATV002,Debênture ABC,Companhia ABC S.A.,Renda Fixa,50.00,1015.12,50756.00,45.00
+FUND002,Fundo Beta,2026-07-02,ATV001,Ação XYZ,Empresa XYZ S.A.,Ação,500.00,10.75,5375.00,8.25
+FUND002,Fundo Beta,2026-07-02,ATV003,Cota FII Delta,Grupo Delta Ltda.,FII,200.00,98.20,19640.00,18.00
+FUND003,Fundo Gamma,2026-07-02,ATV004,Tesouro IPCA,Empresa XYZ S.A.,Título Público,80.00,1234.55,98764.00,20.00
+FUND003,Fundo Gamma,2026-07-02,ATV005,CDB Banco Omega,Companhia ABC S.A.,CDB,120.00,1000.00,120000.00,25.00

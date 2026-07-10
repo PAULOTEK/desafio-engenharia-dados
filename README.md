@@ -371,28 +371,3 @@ Se quiser ficar mais completo:
      v
 [Risk | Compliance | Gestão | BI]
 ```
-
----
-
-## Próximos passos para deixar o projeto pronto para GitHub
-
-1. Criar o repositório privado
-2. Subir a estrutura de pastas
-3. Colar os scripts SQL
-4. Implementar os jobs PySpark
-5. Adicionar os testes
-6. Ajustar o Docker Compose
-7. Escrever o README final
-8. Versionar tudo com commits claros
-
----
-
-## Recomendação final
-
-Se a entrega for para entrevista, apresente o projeto com esta narrativa:
-
-> A solução separa claramente ingestão, tratamento e consumo analítico. A bronze preserva os dados no formato Avro, a silver aplica regras e padronização em Delta Lake e a gold gera visões otimizadas para análise. A orquestração fica com o Control-M, enquanto o Spark garante o processamento distribuído.
-
----
-
-Se quiser, no próximo passo eu posso transformar isso em um **repositório completo file-by-file**, te entregando cada arquivo separado com o conteúdo pronto para copiar e colar.
