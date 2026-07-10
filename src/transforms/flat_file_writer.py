@@ -40,16 +40,17 @@ def _format_for_output(df: DataFrame) -> DataFrame:
 
 def _write_aligned_view(rows: list, path: str) -> None:
     """Write a human-readable, column-aligned table (fixed-width) for easy reading."""
+    str_rows = [["" if v is None else str(v) for v in r] for r in rows]
     widths = [
-        max(len(FLAT_FILE_COLUMNS[i]), max((len(r[i]) for r in rows), default=0))
+        max(len(FLAT_FILE_COLUMNS[i]), max((len(r[i]) for r in str_rows), default=0))
         for i in range(len(FLAT_FILE_COLUMNS))
     ]
 
     def fmt(values):
-        return " | ".join(str(v).ljust(widths[i]) for i, v in enumerate(values))
+        return " | ".join(v.ljust(widths[i]) for i, v in enumerate(values))
 
     lines = [fmt(FLAT_FILE_COLUMNS), "-+-".join("-" * w for w in widths)]
-    lines += [fmt(r) for r in rows]
+    lines += [fmt(r) for r in str_rows]
     with open(path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
 
